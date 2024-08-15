@@ -1,5 +1,5 @@
-var currentTab;
-var currentBookmark;
+let currentTab;
+let currentBookmark;
 
 /*
  * Updates the browserAction icon to reflect whether the current page
@@ -39,11 +39,11 @@ browser.browserAction.onClicked.addListener(toggleBookmark);
 /*
  * Switches currentTab and currentBookmark to reflect the currently active tab
  */
-function updateActiveTab(tabs) {
+function updateAddonStateForActiveTab(tabs) {
 
   function isSupportedProtocol(urlString) {
-    var supportedProtocols = ["https:", "http:", "ftp:", "file:"];
-    var url = document.createElement('a');
+    let supportedProtocols = ["https:", "http:", "ftp:", "file:"];
+    let url = document.createElement('a');
     url.href = urlString;
     return supportedProtocols.indexOf(url.protocol) != -1;
   }
@@ -52,7 +52,7 @@ function updateActiveTab(tabs) {
     if (tabs[0]) {
       currentTab = tabs[0];
       if (isSupportedProtocol(currentTab.url)) {
-        var searching = browser.bookmarks.search({url: currentTab.url});
+        let searching = browser.bookmarks.search({url: currentTab.url});
         searching.then((bookmarks) => {
           currentBookmark = bookmarks[0];
           updateIcon();
@@ -63,24 +63,24 @@ function updateActiveTab(tabs) {
     }
   }
 
-  var gettingActiveTab = browser.tabs.query({active: true, currentWindow: true});
+  let gettingActiveTab = browser.tabs.query({active: true, currentWindow: true});
   gettingActiveTab.then(updateTab);
 }
 
 // listen for bookmarks being created
-browser.bookmarks.onCreated.addListener(updateActiveTab);
+browser.bookmarks.onCreated.addListener(updateAddonStateForActiveTab);
 
 // listen for bookmarks being removed
-browser.bookmarks.onRemoved.addListener(updateActiveTab);
+browser.bookmarks.onRemoved.addListener(updateAddonStateForActiveTab);
 
 // listen to tab URL changes
-browser.tabs.onUpdated.addListener(updateActiveTab);
+browser.tabs.onUpdated.addListener(updateAddonStateForActiveTab);
 
 // listen to tab switching
-browser.tabs.onActivated.addListener(updateActiveTab);
+browser.tabs.onActivated.addListener(updateAddonStateForActiveTab);
 
 // listen for window switching
-browser.windows.onFocusChanged.addListener(updateActiveTab);
+browser.windows.onFocusChanged.addListener(updateAddonStateForActiveTab);
 
 // update when the extension loads initially
-updateActiveTab();
+updateAddonStateForActiveTab();
